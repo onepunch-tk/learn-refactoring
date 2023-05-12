@@ -57,7 +57,6 @@
 
 /*refactoring*/
 function statement(invoice, plays) {
-  let totalAmount = 0;
   let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
   /*format 함수 추출*/
@@ -139,12 +138,23 @@ function statement(invoice, plays) {
   /*1-7
    * 관련 코드들을 한곳에 모아두면 임시 변수를 질의 함수로 바꾸기(Replace Temp with Query)를 통해 함수 추출*/
   function totalVolumeCredits() {
-    let volumeCredits = 0;
+    let result = 0;
     invoice.performance.forEach((perf) => {
       //포인트 적립
-      volumeCredits += volumeCreditsFor(perf);
+      result += volumeCreditsFor(perf);
     });
-    return volumeCredits;
+    return result;
+  }
+
+  function totalAmount() {
+    let result = 0;
+    invoice.performance.forEach((perf) => {
+      /*1-4 임시 변수 thisAmount 변수 인라인하기 Inline Variable*/
+      //Extract Function 호출
+      result += amountFor(perf);
+    });
+
+    return result;
   }
 
   invoice.performance.forEach((perf) => {
@@ -152,13 +162,9 @@ function statement(invoice, plays) {
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    /*1-4 임시 변수 thisAmount 변수 인라인하기 Inline Variable*/
-    //Extract Function 호출
-    totalAmount += amountFor(perf);
   });
-
   //변수 인라인. 기존 지역 변수 제거.
-  result += `총액: ${usd(totalAmount)}\n`;
+  result += `총액: ${usd(totalAmount())}\n`;
   result += `적립 포인트: ${totalVolumeCredits()}점\n`;
   return result;
 }
