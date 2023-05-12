@@ -132,7 +132,7 @@ function statement(invoice, plays) {
 
   /*1-5
    * 반복문 쪼개기 Split Loop
-   * 해당 예제에서는 volumeCredits 변수를 제거하기 위해 사용*/
+   * 해당 예제에서는 지역 변수인 volumeCredits,totalAmount 를 제거하기 위해 사용*/
   /*1-6
    * 문장 슬라이드 Slide Statement
    * 관련 코드를 한곳에 모은다.*/
