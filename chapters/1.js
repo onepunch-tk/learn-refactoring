@@ -60,11 +60,15 @@ function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format;
+
+  /*format 함수 추출*/
+  function usd(aNumber) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(aNumber / 100);
+  }
 
   /*1-1
    * statement() 처럼 긴 함수를 리팩터링할 때는
@@ -116,25 +120,34 @@ function statement(invoice, plays) {
     return plays[aPerformance.playID];
   }
 
+  /*포인트 적립 로직 추출*/
+  function volumeCreditsFor(aPerformance) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    //희극 관객 5명마다 추가 포인트를 제공한다.
+    if ("comedy" === playFor(aPerformance).type) {
+      result += Math.floor(aPerformance.audience / 5);
+    }
+
+    return result;
+  }
+
   invoice.performance.forEach((perf) => {
     //Extract Function 호출
     /*1-4 임시 변수 thisAmount 변수 인라인하기 Inline Variable*/
     //let thisAmount = amountFor(perf);
+
     //포인트 적립
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    //희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === playFor(perf).type) {
-      volumeCredits += Math.floor(perf.audience / 5);
-    }
+    volumeCredits += volumeCreditsFor(perf);
 
     //청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${
+    result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
     totalAmount += amountFor(perf);
   });
 
-  result += `총액: ${format(totalAmount / 100)}\n`;
+  result += `총액: ${usd(totalAmount)}\n`;
   result += `적립 포인트: ${volumeCredits}점\n`;
   return result;
 }
