@@ -1,7 +1,6 @@
 import expect from "expect";
 import statement from "../chapters/1";
 import { invoices, plays } from "../datas/chapter1";
-//datas
 
 test("bill printing", () => {
   expect(statement(invoices, plays)).toBe(
@@ -12,5 +11,4 @@ test("bill printing", () => {
       "총액: $1,730.00\n" +
       "적립 포인트: 47점\n"
   );
-  console.log(statement(invoices, plays));
 });
